@@ -6,39 +6,6 @@ const githubHeaders = {
   Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
 };
 
-const fetchRepositories = async (difficulty = "beginner") => {
-  try {
-    let query = "";
-
-    if (difficulty === "beginner") {
-      query = "good-first-issues:>5 help-wanted-issues:>5";
-    }
-
-    if (difficulty === "intermediate") {
-      query = "help-wanted-issues:>10 stars:>500";
-    }
-
-    if (difficulty === "advanced") {
-      query = "stars:>5000 language:typescript";
-    }
-
-    const response = await axios.get(`${GITHUB_API}/search/repositories`, {
-      headers: githubHeaders,
-      params: {
-        q: query,
-        sort: "stars",
-        order: "desc",
-        per_page: 12,
-      },
-    });
-
-    return response.data.items;
-  } catch (error) {
-    console.log(error.message);
-    throw error;
-  }
-};
-
 const fetchBeginnerIssues = async (owner, repo, difficulty = "beginner") => {
   try {
     const response = await axios.get(
@@ -47,7 +14,7 @@ const fetchBeginnerIssues = async (owner, repo, difficulty = "beginner") => {
         headers: githubHeaders,
         params: {
           state: "open",
-          per_page: 10,
+          per_page: 20,
         },
       },
     );
@@ -77,20 +44,77 @@ const fetchBeginnerIssues = async (owner, repo, difficulty = "beginner") => {
         return false;
       }
 
-      if (difficulty === "advanced") {
-        return true;
-      }
-
       return issue.labels.some((label) =>
         labels.some((targetLabel) =>
-          label.name.toLowerCase().includes(targetLabel),
+          label.name.toLowerCase().includes(targetLabel.toLowerCase()),
         ),
       );
     });
 
     return filteredIssues;
+  } catch (error) {
+    console.log(error.message);
+    return [];
+  }
+};
 
-    return beginnerIssues;
+const fetchRepositories = async (difficulty = "beginner") => {
+  try {
+    let query = "";
+
+    if (difficulty === "beginner") {
+      query = "good-first-issues:>0";
+    }
+
+    if (difficulty === "intermediate") {
+      query = "help-wanted-issues:>10 stars:>500";
+    }
+
+    if (difficulty === "advanced") {
+      query = "stars:>5000 language:typescript";
+    }
+
+    const response = await axios.get(`${GITHUB_API}/search/repositories`, {
+      headers: githubHeaders,
+      params: {
+        q: query,
+        sort: "stars",
+        order: "desc",
+        per_page: 30,
+      },
+    });
+
+    const repositories = response.data.items;
+
+    if (difficulty !== "beginner") {
+      return repositories.slice(0, 12);
+    }
+
+    const verifiedRepositories = [];
+
+    for (const repo of repositories) {
+      try {
+        const issues = await fetchBeginnerIssues(
+          repo.owner.login,
+          repo.name,
+          "beginner",
+        );
+
+        if (issues.length > 0) {
+          verifiedRepositories.push(repo);
+        }
+
+        if (verifiedRepositories.length >= 12) {
+          break;
+        }
+      } catch (error) {
+        console.log(
+          `Failed checking ${repo.full_name}: ${error.message}`,
+        );
+      }
+    }
+
+    return verifiedRepositories;
   } catch (error) {
     console.log(error.message);
     throw error;

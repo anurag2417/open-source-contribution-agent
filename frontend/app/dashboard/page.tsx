@@ -14,9 +14,10 @@ import {
 
 import DashboardNavbar from "../components/layout/DashboardNavbar";
 
-const [user, setUser] = useState<any>(null);
+
 
 export default function DashboardPage() {
+  const [user, setUser] = useState<any>(null);
   const [repositories, setRepositories] = useState([]);
   const [issues, setIssues] = useState([]);
 

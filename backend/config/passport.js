@@ -1,15 +1,14 @@
-const passport = require("passport")
-const GitHubStrategy = require("passport-github2").Strategy
+const passport = require("passport");
+const GitHubStrategy = require("passport-github2").Strategy;
 
-const saveUser = require("../services/userService")
+const saveUser = require("../services/userService");
 
 passport.use(
   new GitHubStrategy(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL:
-        "http://process.env.NEXT_PUBLIC_API_URL/api/auth/github/callback",
+      callbackURL: `${process.env.API_URL}/api/auth/github/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -19,16 +18,16 @@ passport.use(
           displayName: profile.displayName,
           profileUrl: profile.profileUrl,
           avatar: profile.photos?.[0]?.value,
-        }
+        };
 
-        const savedUser = await saveUser(user)
+        const savedUser = await saveUser(user);
 
-        return done(null, savedUser)
+        return done(null, savedUser);
       } catch (error) {
-        return done(error, null)
+        return done(error, null);
       }
-    }
-  )
-)
+    },
+  ),
+);
 
-module.exports = passport
+module.exports = passport;

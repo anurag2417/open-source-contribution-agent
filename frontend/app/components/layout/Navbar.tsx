@@ -31,7 +31,7 @@ export default function Navbar() {
         </div>
 
         <a
-          href="http://process.env.NEXT_PUBLIC_API_URL/api/auth/github"
+          href={`${process.env.NEXT_PUBLIC_API_URL}/api/auth/github`}
           className="flex items-center gap-2 rounded-xl bg-white px-5 py-2 text-sm font-medium text-black transition hover:scale-105"
         >
           <GitFork size={18} />

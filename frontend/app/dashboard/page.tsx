@@ -12,10 +12,7 @@ import {
   fetchRoadmap,
 } from "../lib/api";
 
-import { useSearchParams } from "next/navigation";
 import DashboardNavbar from "../components/layout/DashboardNavbar";
-
-const searchParams = useSearchParams();
 
 const [user, setUser] = useState<any>(null);
 
@@ -50,7 +47,9 @@ export default function DashboardPage() {
   }, [difficulty]);
 
   useEffect(() => {
-    const userParam = searchParams.get("user");
+    const params = new URLSearchParams(window.location.search);
+
+    const userParam = params.get("user");
 
     if (userParam) {
       try {
@@ -59,7 +58,7 @@ export default function DashboardPage() {
         console.log(error);
       }
     }
-  }, [searchParams]);
+  }, []);
 
   const handleRepositoryClick = async (repo: any) => {
     try {

@@ -6,6 +6,38 @@ const githubHeaders = {
   Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
 };
 
+const BEGINNER_LABELS = [
+  "good first issue",
+  "good-first-issue",
+  "beginner",
+  "beginner friendly",
+  "first timers only",
+  "first-timers-only",
+  "easy",
+  "starter",
+  "newcomer",
+];
+
+const INTERMEDIATE_LABELS = [
+  "bug",
+  "enhancement",
+  "feature",
+  "help wanted",
+  "refactor",
+  "documentation",
+  "testing",
+];
+
+const matchesLabels = (issueLabels, targetLabels) => {
+  return issueLabels.some((label) => {
+    const labelName = label.name.toLowerCase();
+
+    return targetLabels.some((target) =>
+      labelName.includes(target.toLowerCase()),
+    );
+  });
+};
+
 const fetchBeginnerIssues = async (owner, repo, difficulty = "beginner") => {
   try {
     const response = await axios.get(
@@ -14,46 +46,38 @@ const fetchBeginnerIssues = async (owner, repo, difficulty = "beginner") => {
         headers: githubHeaders,
         params: {
           state: "open",
-          per_page: 20,
+          per_page: 50,
         },
       },
     );
 
-    let labels = [];
+    const issues = response.data.filter(
+      (issue) => !issue.pull_request,
+    );
+
+    if (difficulty === "advanced") {
+      return issues;
+    }
 
     if (difficulty === "beginner") {
-      labels = [
-        "good first issue",
-        "beginner friendly",
-        "help wanted",
-        "first timers only",
-        "easy",
-      ];
+      return issues.filter((issue) =>
+        matchesLabels(issue.labels, BEGINNER_LABELS),
+      );
     }
 
     if (difficulty === "intermediate") {
-      labels = ["enhancement", "bug", "feature", "help wanted"];
-    }
-
-    if (difficulty === "advanced") {
-      return response.data.filter((issue) => !issue.pull_request);
-    }
-
-    const filteredIssues = response.data.filter((issue) => {
-      if (issue.pull_request) {
-        return false;
-      }
-
-      return issue.labels.some((label) =>
-        labels.some((targetLabel) =>
-          label.name.toLowerCase().includes(targetLabel.toLowerCase()),
-        ),
+      return issues.filter((issue) =>
+        matchesLabels(issue.labels, INTERMEDIATE_LABELS),
       );
-    });
+    }
 
-    return filteredIssues;
+    return [];
   } catch (error) {
-    console.log(error.message);
+    console.log(
+      `Issue fetch failed for ${owner}/${repo}:`,
+      error.message,
+    );
+
     return [];
   }
 };
@@ -62,31 +86,43 @@ const fetchRepositories = async (difficulty = "beginner") => {
   try {
     let query = "";
 
-    if (difficulty === "beginner") {
-      query = "good-first-issues:>0";
+    switch (difficulty) {
+      case "beginner":
+        query =
+          "good-first-issues:>0 archived:false is:public";
+        break;
+
+      case "intermediate":
+        query =
+          "help-wanted-issues:>0 stars:>100 archived:false is:public";
+        break;
+
+      case "advanced":
+        query =
+          "stars:>5000 archived:false is:public";
+        break;
+
+      default:
+        query =
+          "good-first-issues:>0 archived:false is:public";
     }
 
-    if (difficulty === "intermediate") {
-      query = "help-wanted-issues:>10 stars:>500";
-    }
-
-    if (difficulty === "advanced") {
-      query = "stars:>5000 language:typescript";
-    }
-
-    const response = await axios.get(`${GITHUB_API}/search/repositories`, {
-      headers: githubHeaders,
-      params: {
-        q: query,
-        sort: "stars",
-        order: "desc",
-        per_page: 30,
+    const response = await axios.get(
+      `${GITHUB_API}/search/repositories`,
+      {
+        headers: githubHeaders,
+        params: {
+          q: query,
+          sort: "stars",
+          order: "desc",
+          per_page: 50,
+        },
       },
-    });
+    );
 
     const repositories = response.data.items;
 
-    if (difficulty !== "beginner") {
+    if (difficulty === "advanced") {
       return repositories.slice(0, 12);
     }
 
@@ -97,7 +133,7 @@ const fetchRepositories = async (difficulty = "beginner") => {
         const issues = await fetchBeginnerIssues(
           repo.owner.login,
           repo.name,
-          "beginner",
+          difficulty,
         );
 
         if (issues.length > 0) {
@@ -109,7 +145,8 @@ const fetchRepositories = async (difficulty = "beginner") => {
         }
       } catch (error) {
         console.log(
-          `Failed checking ${repo.full_name}: ${error.message}`,
+          `Repository validation failed for ${repo.full_name}:`,
+          error.message,
         );
       }
     }
@@ -121,7 +158,11 @@ const fetchRepositories = async (difficulty = "beginner") => {
   }
 };
 
-const fetchSingleIssue = async (owner, repo, issueNumber) => {
+const fetchSingleIssue = async (
+  owner,
+  repo,
+  issueNumber,
+) => {
   try {
     const response = await axios.get(
       `${GITHUB_API}/repos/${owner}/${repo}/issues/${issueNumber}`,

@@ -61,7 +61,7 @@ export default function DashboardNavbar({
               </p>
 
               <p className="text-xs text-cyan-400">
-                Intermediate Contributor
+                Open Source Explorer
               </p>
             </div>
           </div>

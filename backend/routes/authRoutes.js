@@ -17,9 +17,17 @@ router.get(
     session: false,
   }),
   (req, res) => {
-    const userData = encodeURIComponent(JSON.stringify(req.user));
+    try {
+      const userData = encodeURIComponent(JSON.stringify(req.user));
 
-    res.redirect(`${process.env.CLIENT_URL}/dashboard?user=${userData}`);
+      res.redirect(
+        `${process.env.CLIENT_URL}/dashboard?user=${userData}`,
+      );
+    } catch (error) {
+      console.error("CALLBACK ERROR:");
+      console.error(error);
+      res.status(500).json(error);
+    }
   },
 );
 

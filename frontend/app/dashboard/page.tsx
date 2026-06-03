@@ -12,6 +12,13 @@ import {
   fetchRoadmap,
 } from "../lib/api";
 
+import { useSearchParams } from "next/navigation";
+import DashboardNavbar from "../components/layout/DashboardNavbar";
+
+const searchParams = useSearchParams();
+
+const [user, setUser] = useState<any>(null);
+
 export default function DashboardPage() {
   const [repositories, setRepositories] = useState([]);
   const [issues, setIssues] = useState([]);
@@ -41,6 +48,18 @@ export default function DashboardPage() {
   useEffect(() => {
     loadRepositories();
   }, [difficulty]);
+
+  useEffect(() => {
+    const userParam = searchParams.get("user");
+
+    if (userParam) {
+      try {
+        setUser(JSON.parse(decodeURIComponent(userParam)));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }, [searchParams]);
 
   const handleRepositoryClick = async (repo: any) => {
     try {
@@ -88,7 +107,8 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <div className="grid min-h-screen lg:grid-cols-[340px_420px_1fr]">
+      <DashboardNavbar user={user || {}} />
+      <div className="grid h-[calc(100vh-81px)] lg:grid-cols-[340px_420px_1fr]">
         <div className="border-r border-white/5 p-6">
           <h2 className="mb-8 text-2xl font-bold">Repositories</h2>
 
@@ -119,7 +139,9 @@ export default function DashboardPage() {
                     : "border-white/5 bg-white/5 hover:border-cyan-400/30 hover:bg-white/10"
                 }`}
               >
-                <h3 className="line-clamp-2 text-sm font-semibold leading-6">{repo.full_name}</h3>
+                <h3 className="line-clamp-2 text-sm font-semibold leading-6">
+                  {repo.full_name}
+                </h3>
 
                 <p className="mt-2 line-clamp-2 text-sm text-gray-400">
                   {repo.description}

@@ -27,22 +27,20 @@ Provide response in this format:
 6. Estimated Completion Time
 `;
 
-    const response =
-      await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert open source mentor.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.7,
-      });
+    const response = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert open source mentor.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+    });
 
     return response.choices[0].message.content;
   } catch (error) {
@@ -51,10 +49,7 @@ Provide response in this format:
   }
 };
 
-const generateContributionRoadmap = async (
-  issue,
-  repository,
-) => {
+const generateContributionRoadmap = async (issue, repository) => {
   try {
     const prompt = `
 You are an expert open source mentor helping beginners contribute to GitHub projects.
@@ -92,22 +87,20 @@ Generate response in this format:
 Keep explanations beginner-friendly.
 `;
 
-    const response =
-      await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert open source mentor.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.7,
-      });
+    const response = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert open source mentor.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+    });
 
     return response.choices[0].message.content;
   } catch (error) {
@@ -116,11 +109,7 @@ Keep explanations beginner-friendly.
   }
 };
 
-const analyzeRepositoryArchitecture = async (
-  repository,
-  contents,
-  readme,
-) => {
+const analyzeRepositoryArchitecture = async (repository, contents, readme) => {
   try {
     const prompt = `
 You are an expert open source mentor.
@@ -137,12 +126,7 @@ Primary Language:
 ${repository.language}
 
 Repository Contents:
-${contents
-  .map(
-    (item) =>
-      `${item.type}: ${item.name}`,
-  )
-  .join("\n")}
+${contents.map((item) => `${item.type}: ${item.name}`).join("\n")}
 
 README:
 ${String(readme).slice(0, 4000)}
@@ -160,6 +144,63 @@ Generate the response in this format:
 Keep everything beginner friendly.
 `;
 
+    const response = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an expert software architect and open source mentor.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.5,
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+const generateImplementationStrategy = async (
+  issue,
+  repository,
+) => {
+  try {
+    const prompt = `
+You are an expert open source mentor.
+
+Repository:
+${repository.full_name}
+
+Language:
+${repository.language}
+
+Issue Title:
+${issue.title}
+
+Issue Description:
+${issue.body}
+
+Generate a practical contribution simulator.
+
+Return:
+
+1. First File To Open
+2. Why This File Matters
+3. What To Look For
+4. Possible Code Changes
+5. Expected Result
+6. Testing Steps
+
+Keep it beginner friendly.
+`;
+
     const response =
       await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
@@ -167,7 +208,7 @@ Keep everything beginner friendly.
           {
             role: "system",
             content:
-              "You are an expert software architect and open source mentor.",
+              "You are an expert open source mentor.",
           },
           {
             role: "user",
@@ -188,4 +229,5 @@ module.exports = {
   summarizeIssue,
   generateContributionRoadmap,
   analyzeRepositoryArchitecture,
+  generateImplementationStrategy,
 };

@@ -2,6 +2,7 @@ const express = require("express");
 const {
   summarizeIssue,
   generateContributionRoadmap,
+  generateImplementationStrategy,
 } = require("../services/openaiService");
 
 const {
@@ -95,5 +96,40 @@ router.get("/roadmap/:owner/:repo/:issueNumber", async (req, res) => {
     });
   }
 });
+
+router.get(
+  "/implementation-strategy/:owner/:repo/:issueNumber",
+  async (req, res) => {
+    try {
+      const { owner, repo, issueNumber } = req.params;
+
+      const issue = await fetchSingleIssue(owner, repo, issueNumber);
+
+      const repositories = await fetchRepositories();
+
+      const repository = repositories.find(
+        (repoData) => repoData.name.toLowerCase() === repo.toLowerCase(),
+      );
+
+      const strategy = await generateImplementationStrategy(
+        issue,
+        repository || {
+          full_name: `${owner}/${repo}`,
+          language: "Unknown",
+        },
+      );
+
+      res.json({
+        strategy: strategy.replace(/\\n/g, "\n"),
+      });
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).json({
+        message: "Failed to generate implementation strategy",
+      });
+    }
+  },
+);
 
 module.exports = router;

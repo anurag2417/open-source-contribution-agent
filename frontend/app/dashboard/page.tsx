@@ -12,6 +12,7 @@ import {
   fetchRoadmap,
   fetchRecommendations,
   fetchRepositoryAnalysis,
+  fetchImplementationStrategy,
 } from "../lib/api";
 
 import DashboardNavbar from "../components/layout/DashboardNavbar";
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [repositoryAnalysis, setRepositoryAnalysis] = useState<any>(null);
   const [checklist, setChecklist] = useState<string[]>([]);
+  const [implementationStrategy, setImplementationStrategy] = useState("");
 
   const [repositories, setRepositories] = useState([]);
   const [issues, setIssues] = useState([]);
@@ -124,9 +126,16 @@ export default function DashboardPage() {
         issue.number,
       );
 
+      const strategy = await fetchImplementationStrategy(
+        selectedRepo.owner.login,
+        selectedRepo.name,
+        issue.number,
+      );
+
       setSummary(aiSummary.aiSummary);
       setRoadmap(aiRoadmap.roadmap);
       setChecklist(generateChecklist());
+      setImplementationStrategy(strategy.strategy);
 
       setLoading(false);
     } catch (error) {
@@ -685,6 +694,18 @@ export default function DashboardPage() {
 
                   <pre className="whitespace-pre-wrap text-sm leading-7 text-gray-300">
                     {roadmap}
+                  </pre>
+                </div>
+              )}
+
+              {implementationStrategy && (
+                <div className="rounded-3xl border border-green-500/20 bg-green-500/5 p-8">
+                  <h3 className="mb-6 text-2xl font-bold text-green-400">
+                    AI Contribution Simulator
+                  </h3>
+
+                  <pre className="whitespace-pre-wrap text-sm leading-7 text-gray-300">
+                    {implementationStrategy}
                   </pre>
                 </div>
               )}

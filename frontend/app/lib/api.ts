@@ -72,3 +72,16 @@ export const fetchRepositoryAnalysis = async (
 
   return response.data;
 };
+
+export const fetchImplementationStrategy =
+  async (
+    owner: string,
+    repo: string,
+    issueNumber: number,
+  ) => {
+    const response = await API.get(
+      `/github/implementation-strategy/${owner}/${repo}/${issueNumber}`,
+    );
+
+    return response.data;
+  };

@@ -118,6 +118,96 @@ const analyzeProfile = async (req, res) => {
   }
 };
 
+const getRecommendations = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const userResponse = await axios.get(
+      `https://api.github.com/users/${username}/repos?per_page=100`,
+      {
+        headers: githubHeaders,
+      },
+    );
+
+    const repos = userResponse.data;
+
+    const languageCount = {};
+
+    for (let i = 0; i < repos.length; i++) {
+      const repo = repos[i];
+
+      if (repo.language) {
+        languageCount[repo.language] =
+          (languageCount[repo.language] || 0) + 1;
+      }
+    }
+
+    const topLanguages = Object.entries(languageCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([language]) => language);
+
+    const searchQueries = [
+      "good first issue",
+      "help wanted",
+      "beginner",
+    ];
+
+    const recommendations = [];
+
+    for (let i = 0; i < searchQueries.length; i++) {
+      const searchResponse = await axios.get(
+        `https://api.github.com/search/issues?q=${encodeURIComponent(
+          `${searchQueries[i]} state:open`,
+        )}&per_page=10`,
+        {
+          headers: githubHeaders,
+        },
+      );
+
+      const issues = searchResponse.data.items || [];
+
+      for (let j = 0; j < issues.length; j++) {
+        const issue = issues[j];
+
+        recommendations.push({
+          id: issue.id,
+          title: issue.title,
+          url: issue.html_url,
+          repository:
+            issue.repository_url.split("/repos/")[1],
+          matchReason: [
+            "Good First Issue",
+            "Open Source Friendly",
+          ],
+        });
+      }
+    }
+
+    const uniqueRecommendations = recommendations
+      .filter(
+        (issue, index, self) =>
+          index ===
+          self.findIndex(
+            (item) => item.id === issue.id,
+          ),
+      )
+      .slice(0, 5);
+
+    res.json({
+      topLanguages,
+      recommendations: uniqueRecommendations,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to generate recommendations",
+    });
+  }
+};
+
 module.exports = {
   analyzeProfile,
+  getRecommendations,
 };

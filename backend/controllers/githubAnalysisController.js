@@ -42,10 +42,14 @@ const analyzeProfile = async (req, res) => {
         switch (repo.language.toLowerCase()) {
           case "javascript":
           case "typescript":
+          case "css":
+          case "html":
             interestsSet.add("Frontend Development");
             break;
 
           case "java":
+          case "c#":
+          case "php":
             interestsSet.add("Backend Development");
             break;
 
@@ -122,36 +126,34 @@ const getRecommendations = async (req, res) => {
   try {
     const { username } = req.params;
 
-    const userResponse = await axios.get(
+    const reposResponse = await axios.get(
       `https://api.github.com/users/${username}/repos?per_page=100`,
       {
         headers: githubHeaders,
       },
     );
 
-    const repos = userResponse.data;
+    const repos = reposResponse.data;
 
-    const languageCount = {};
+    const languageMap = {};
 
     for (let i = 0; i < repos.length; i++) {
       const repo = repos[i];
 
       if (repo.language) {
-        languageCount[repo.language] =
-          (languageCount[repo.language] || 0) + 1;
+        languageMap[repo.language] =
+          (languageMap[repo.language] || 0) + 1;
       }
     }
 
-    const topLanguages = Object.entries(languageCount)
+    const topLanguages = Object.entries(languageMap)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
       .map(([language]) => language);
 
-    const searchQueries = [
-      "good first issue",
-      "help wanted",
-      "beginner",
-    ];
+    const searchQueries = topLanguages.map(
+      (language) => `good first issue ${language}`,
+    );
 
     const recommendations = [];
 
@@ -159,7 +161,7 @@ const getRecommendations = async (req, res) => {
       const searchResponse = await axios.get(
         `https://api.github.com/search/issues?q=${encodeURIComponent(
           `${searchQueries[i]} state:open`,
-        )}&per_page=10`,
+        )}&per_page=15`,
         {
           headers: githubHeaders,
         },
@@ -176,9 +178,14 @@ const getRecommendations = async (req, res) => {
           url: issue.html_url,
           repository:
             issue.repository_url.split("/repos/")[1],
+          language:
+            topLanguages[
+              i % topLanguages.length
+            ],
           matchReason: [
+            `Matches ${topLanguages[i % topLanguages.length]}`,
             "Good First Issue",
-            "Open Source Friendly",
+            "Beginner Friendly",
           ],
         });
       }
@@ -195,7 +202,6 @@ const getRecommendations = async (req, res) => {
       .slice(0, 5);
 
     res.json({
-      topLanguages,
       recommendations: uniqueRecommendations,
     });
   } catch (error) {

@@ -295,10 +295,10 @@ export default function DashboardPage() {
   const learningGap = getLearningGapAnalysis();
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="h-screen overflow-hidden bg-black text-white">
       <DashboardNavbar user={user || {}} analysis={analysis} />
 
-      <div className="grid h-[calc(100vh-81px)] lg:grid-cols-[340px_420px_1fr]">
+      <div className="h-[calc(100vh-81px)] grid lg:grid-cols-[340px_420px_1fr] overflow-hidden">
         <div className="border-r border-white/5 p-6">
           <h2 className="mb-8 text-2xl font-bold">Repositories</h2>
 
@@ -389,7 +389,7 @@ export default function DashboardPage() {
               </p>
             </div>
           ) : (
-            <div className="max-h-[90vh] space-y-8 overflow-y-auto overflow-x-hidden pr-4">
+            <div className="h-full space-y-8 overflow-y-auto overflow-x-hidden pr-4">
               {repositoryAnalysis && !selectedIssue && (
                 <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
                   <h3 className="mb-6 text-2xl font-bold text-cyan-400">

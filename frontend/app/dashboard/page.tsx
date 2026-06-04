@@ -299,7 +299,7 @@ export default function DashboardPage() {
       <DashboardNavbar user={user || {}} analysis={analysis} />
 
       <div className="grid h-[calc(100vh-81px)] overflow-hidden lg:grid-cols-[340px_420px_1fr]">
-        <div className="flex h-full flex-col border-r border-white/5 p-6">
+        <div className="flex h-full min-h-0 flex-col border-r border-white/5 p-6">
           <h2 className="mb-8 text-2xl font-bold">Repositories</h2>
 
           <div className="mb-6 flex flex-wrap gap-3">
@@ -347,7 +347,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="flex h-full flex-col border-r border-white/5 p-6">
+        <div className="flex h-full min-h-0 flex-col border-r border-white/5 p-6">
           {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Issues
           <div className="flex-1 space-y-4 overflow-y-auto overflow-x-hidden pr-2">
             {issues.map((issue: any) => (
@@ -389,7 +389,7 @@ export default function DashboardPage() {
               </p>
             </div>
           ) : (
-            <div className="h-full space-y-8 overflow-y-auto overflow-x-hidden pr-4 pb-16">
+            <div className="min-h-0 flex-1 space-y-8 overflow-y-auto overflow-x-hidden pr-4 pb-16">
               {repositoryAnalysis && !selectedIssue && (
                 <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
                   <h3 className="mb-6 text-2xl font-bold text-cyan-400">

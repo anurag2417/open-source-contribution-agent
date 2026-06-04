@@ -229,6 +229,7 @@ const analyzeRepository = async (req, res) => {
       contents,
       readme,
     );
+    
 
     res.json({
       repository: repository.full_name,

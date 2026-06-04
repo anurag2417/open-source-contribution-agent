@@ -411,7 +411,7 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {repositoryAnalysis?.contents && (
+              {/* {repositoryAnalysis?.contents && (
                 <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
                   <h3 className="mb-6 text-2xl font-bold text-cyan-400">
                     Repository Explorer
@@ -429,7 +429,7 @@ export default function DashboardPage() {
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
 
               {!selectedIssue && analysis && (
                 <div className="rounded-3xl border border-white/5 bg-white/5 p-8">

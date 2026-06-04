@@ -175,7 +175,63 @@ export default function DashboardPage() {
     };
   };
 
+  const estimateCompletionTime = () => {
+    if (!selectedIssue || !analysis) {
+      return null;
+    }
+
+    const title = selectedIssue.title.toLowerCase();
+
+    const labels =
+      selectedIssue.labels?.map((label: any) => label.name.toLowerCase()) || [];
+
+    let complexity = 1;
+
+    if (labels.some((label: string) => label.includes("good first issue"))) {
+      complexity += 1;
+    }
+
+    if (labels.some((label: string) => label.includes("bug"))) {
+      complexity += 2;
+    }
+
+    if (labels.some((label: string) => label.includes("enhancement"))) {
+      complexity += 3;
+    }
+
+    if (labels.some((label: string) => label.includes("feature"))) {
+      complexity += 4;
+    }
+
+    if (title.length > 80) {
+      complexity += 2;
+    }
+
+    if (analysis.experienceLevel === "Beginner") {
+      complexity += 1;
+    }
+
+    if (complexity <= 2) {
+      return "15-30 Minutes";
+    }
+
+    if (complexity <= 4) {
+      return "30-60 Minutes";
+    }
+
+    if (complexity <= 6) {
+      return "1-3 Hours";
+    }
+
+    if (complexity <= 8) {
+      return "Half Day";
+    }
+
+    return "1-2 Days";
+  };
+
   const matchResult = calculateMatchScore();
+  const estimatedTime = estimateCompletionTime();
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -428,6 +484,23 @@ export default function DashboardPage() {
                           </span>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {estimatedTime && (
+                    <div className="mt-6 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5">
+                      <h4 className="mb-3 text-lg font-bold text-blue-400">
+                        Estimated Completion Time
+                      </h4>
+
+                      <p className="text-3xl font-bold text-white">
+                        {estimatedTime}
+                      </p>
+
+                      <p className="mt-2 text-sm text-gray-400">
+                        Based on issue complexity, labels and your experience
+                        level.
+                      </p>
                     </div>
                   )}
 

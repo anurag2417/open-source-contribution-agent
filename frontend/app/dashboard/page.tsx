@@ -124,6 +124,59 @@ export default function DashboardPage() {
     }
   };
 
+  const calculateMatchScore = () => {
+    if (!analysis || !selectedRepo || !selectedIssue) {
+      return null;
+    }
+
+    let score = 50;
+
+    const reasons = [];
+
+    if (analysis.topLanguages?.includes(selectedRepo.language)) {
+      score += 25;
+
+      reasons.push(`Matches ${selectedRepo.language}`);
+    }
+
+    const labels =
+      selectedIssue.labels?.map((label: any) => label.name.toLowerCase()) || [];
+
+    const beginnerLabels = [
+      "good first issue",
+      "good-first-issue",
+      "beginner",
+      "easy",
+      "starter",
+    ];
+
+    const beginnerMatch = labels.some((label: string) =>
+      beginnerLabels.some((target) => label.includes(target)),
+    );
+
+    if (beginnerMatch && analysis.experienceLevel === "Beginner") {
+      score += 15;
+
+      reasons.push("Beginner Friendly");
+    }
+
+    if (
+      analysis.interests?.includes("Frontend Development") &&
+      ["JavaScript", "TypeScript"].includes(selectedRepo.language)
+    ) {
+      score += 10;
+
+      reasons.push("Frontend Match");
+    }
+
+    return {
+      score: Math.min(score, 100),
+      reasons,
+    };
+  };
+
+  const matchResult = calculateMatchScore();
+
   return (
     <main className="min-h-screen bg-black text-white">
       <DashboardNavbar user={user || {}} analysis={analysis} />
@@ -354,6 +407,29 @@ export default function DashboardPage() {
               {selectedIssue && (
                 <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
                   <h3 className="text-2xl font-bold">{selectedIssue.title}</h3>
+
+                  {matchResult && (
+                    <div className="mt-6 rounded-2xl border border-green-500/20 bg-green-500/5 p-5">
+                      <h4 className="mb-3 text-lg font-bold text-green-400">
+                        Skill Match Score
+                      </h4>
+
+                      <p className="text-3xl font-bold text-white">
+                        {matchResult.score}%
+                      </p>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {matchResult.reasons.map((reason: string) => (
+                          <span
+                            key={reason}
+                            className="rounded-full bg-green-500/10 px-3 py-1 text-xs text-green-300"
+                          >
+                            {reason}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <a
                     href={selectedIssue.html_url}

@@ -36,8 +36,7 @@ const analyzeProfile = async (req, res) => {
       totalStars += repo.stargazers_count || 0;
 
       if (repo.language) {
-        languageMap[repo.language] =
-          (languageMap[repo.language] || 0) + 1;
+        languageMap[repo.language] = (languageMap[repo.language] || 0) + 1;
 
         switch (repo.language.toLowerCase()) {
           case "javascript":
@@ -77,9 +76,7 @@ const analyzeProfile = async (req, res) => {
       .map(([language]) => language);
 
     const score =
-      user.public_repos * 2 +
-      user.followers +
-      Math.floor(totalStars / 10);
+      user.public_repos * 2 + user.followers + Math.floor(totalStars / 10);
 
     let experienceLevel = "Beginner";
 
@@ -141,8 +138,7 @@ const getRecommendations = async (req, res) => {
       const repo = repos[i];
 
       if (repo.language) {
-        languageMap[repo.language] =
-          (languageMap[repo.language] || 0) + 1;
+        languageMap[repo.language] = (languageMap[repo.language] || 0) + 1;
       }
     }
 
@@ -176,12 +172,8 @@ const getRecommendations = async (req, res) => {
           id: issue.id,
           title: issue.title,
           url: issue.html_url,
-          repository:
-            issue.repository_url.split("/repos/")[1],
-          language:
-            topLanguages[
-              i % topLanguages.length
-            ],
+          repository: issue.repository_url.split("/repos/")[1],
+          language: topLanguages[i % topLanguages.length],
           matchReason: [
             `Matches ${topLanguages[i % topLanguages.length]}`,
             "Good First Issue",
@@ -194,10 +186,7 @@ const getRecommendations = async (req, res) => {
     const uniqueRecommendations = recommendations
       .filter(
         (issue, index, self) =>
-          index ===
-          self.findIndex(
-            (item) => item.id === issue.id,
-          ),
+          index === self.findIndex((item) => item.id === issue.id),
       )
       .slice(0, 5);
 
@@ -213,7 +202,44 @@ const getRecommendations = async (req, res) => {
   }
 };
 
+const analyzeRepository = async (req, res) => {
+  try {
+    const { owner, repo } = req.params;
+
+    const response = await axios.get(
+      `https://api.github.com/repos/${owner}/${repo}`,
+      {
+        headers: githubHeaders,
+      },
+    );
+
+    const repository = response.data;
+
+    res.json({
+      name: repository.full_name,
+      description: repository.description,
+      language: repository.language,
+      stars: repository.stargazers_count,
+      forks: repository.forks_count,
+      openIssues: repository.open_issues_count,
+      projectType:
+        repository.language === "TypeScript" ||
+        repository.language === "JavaScript"
+          ? "Web Application"
+          : "Software Project",
+      architectureSummary: `This repository is primarily built with ${repository.language}. Start by reading the README and exploring the main source folders.`,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to analyze repository",
+    });
+  }
+};
+
 module.exports = {
   analyzeProfile,
   getRecommendations,
+  analyzeRepository,
 };

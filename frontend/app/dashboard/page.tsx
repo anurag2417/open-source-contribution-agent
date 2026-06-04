@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const [analysis, setAnalysis] = useState<any>(null);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [repositoryAnalysis, setRepositoryAnalysis] = useState<any>(null);
+  const [checklist, setChecklist] = useState<string[]>([]);
 
   const [repositories, setRepositories] = useState([]);
   const [issues, setIssues] = useState([]);
@@ -125,12 +126,29 @@ export default function DashboardPage() {
 
       setSummary(aiSummary.aiSummary);
       setRoadmap(aiRoadmap.roadmap);
+      setChecklist(generateChecklist());
 
       setLoading(false);
     } catch (error) {
       console.log(error);
       setLoading(false);
     }
+  };
+
+  const generateChecklist = () => {
+    return [
+      "Fork Repository",
+      "Clone Repository",
+      "Read README",
+      "Understand Repository Architecture",
+      "Review Related Issue",
+      "Create Feature Branch",
+      "Implement Solution",
+      "Run Tests",
+      "Commit Changes",
+      "Push Branch",
+      "Create Pull Request",
+    ];
   };
 
   const calculateMatchScore = () => {
@@ -392,7 +410,7 @@ export default function DashboardPage() {
                   </pre>
                 </div>
               )}
-              
+
               {!selectedIssue && analysis && (
                 <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
                   <h3 className="mb-6 text-2xl font-bold text-cyan-400">
@@ -648,6 +666,24 @@ export default function DashboardPage() {
                   <pre className="whitespace-pre-wrap text-sm leading-7 text-gray-300">
                     {roadmap}
                   </pre>
+                </div>
+              )}
+
+              {checklist.length > 0 && (
+                <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
+                  <h3 className="mb-6 text-2xl font-bold text-cyan-400">
+                    Contribution Checklist
+                  </h3>
+
+                  <div className="space-y-3">
+                    {checklist.map((item) => (
+                      <label key={item} className="flex items-center gap-3">
+                        <input type="checkbox" className="h-4 w-4" />
+
+                        <span>{item}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

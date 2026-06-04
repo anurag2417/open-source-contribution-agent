@@ -230,8 +230,33 @@ export default function DashboardPage() {
     return "1-2 Days";
   };
 
+  const getLearningGapAnalysis = () => {
+    if (!analysis || !selectedRepo) {
+      return null;
+    }
+
+    const requiredSkills = [selectedRepo.language, "Git", "GitHub"].filter(
+      Boolean,
+    );
+
+    const missingSkills = [];
+
+    if (
+      selectedRepo.language &&
+      !analysis.topLanguages?.includes(selectedRepo.language)
+    ) {
+      missingSkills.push(selectedRepo.language);
+    }
+
+    return {
+      requiredSkills,
+      missingSkills,
+    };
+  };
+
   const matchResult = calculateMatchScore();
   const estimatedTime = estimateCompletionTime();
+  const learningGap = getLearningGapAnalysis();
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -501,6 +526,54 @@ export default function DashboardPage() {
                         Based on issue complexity, labels and your experience
                         level.
                       </p>
+                    </div>
+                  )}
+
+                  {learningGap && (
+                    <div className="mt-6 rounded-2xl border border-purple-500/20 bg-purple-500/5 p-5">
+                      <h4 className="mb-4 text-lg font-bold text-purple-400">
+                        Learning Gap Analysis
+                      </h4>
+
+                      <div>
+                        <p className="mb-2 text-sm text-gray-400">
+                          Required Skills
+                        </p>
+
+                        <div className="flex flex-wrap gap-2">
+                          {learningGap.requiredSkills.map((skill: string) => (
+                            <span
+                              key={skill}
+                              className="rounded-full bg-green-500/10 px-3 py-1 text-xs text-green-300"
+                            >
+                              ✓ {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mt-5">
+                        <p className="mb-2 text-sm text-gray-400">
+                          Missing Skills
+                        </p>
+
+                        {learningGap.missingSkills.length === 0 ? (
+                          <p className="text-green-400">
+                            No major gaps detected.
+                          </p>
+                        ) : (
+                          <div className="flex flex-wrap gap-2">
+                            {learningGap.missingSkills.map((skill: string) => (
+                              <span
+                                key={skill}
+                                className="rounded-full bg-yellow-500/10 px-3 py-1 text-xs text-yellow-300"
+                              >
+                                ⚠ {skill}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 

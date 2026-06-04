@@ -9,6 +9,7 @@ dotenv.config()
 const passport = require("./config/passport")
 const authRoutes = require("./routes/authRoutes")
 const githubRoutes = require("./routes/githubRoutes")
+const githubAnalysisRoutes = require("./routes/githubAnalysisRoutes");
 
 const app = express()
 
@@ -34,6 +35,7 @@ app.use(passport.initialize())
 
 app.use("/api/auth", authRoutes)
 app.use("/api/github", githubRoutes)
+app.use("/api/github", githubAnalysisRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Backend Running" })

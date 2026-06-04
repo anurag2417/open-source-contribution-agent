@@ -20,9 +20,7 @@ router.get(
     try {
       const userData = encodeURIComponent(JSON.stringify(req.user));
 
-      res.redirect(
-        `${process.env.CLIENT_URL}/dashboard?user=${userData}`,
-      );
+      res.redirect(`${process.env.CLIENT_URL}/analyzing?user=${userData}`);
     } catch (error) {
       console.error("CALLBACK ERROR:");
       console.error(error);

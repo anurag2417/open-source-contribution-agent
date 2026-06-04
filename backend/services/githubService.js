@@ -38,7 +38,11 @@ const matchesLabels = (issueLabels, targetLabels) => {
   });
 };
 
-const fetchBeginnerIssues = async (owner, repo, difficulty = "beginner") => {
+const fetchBeginnerIssues = async (
+  owner,
+  repo,
+  difficulty = "beginner",
+) => {
   try {
     const response = await axios.get(
       `${GITHUB_API}/repos/${owner}/${repo}/issues`,
@@ -82,7 +86,9 @@ const fetchBeginnerIssues = async (owner, repo, difficulty = "beginner") => {
   }
 };
 
-const fetchRepositories = async (difficulty = "beginner") => {
+const fetchRepositories = async (
+  difficulty = "beginner",
+) => {
   try {
     let query = "";
 
@@ -178,8 +184,55 @@ const fetchSingleIssue = async (
   }
 };
 
+const fetchRepositoryContents = async (
+  owner,
+  repo,
+) => {
+  try {
+    const response = await axios.get(
+      `${GITHUB_API}/repos/${owner}/${repo}/contents`,
+      {
+        headers: githubHeaders,
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error.message);
+
+    return [];
+  }
+};
+
+const fetchRepositoryReadme = async (
+  owner,
+  repo,
+) => {
+  try {
+    const response = await axios.get(
+      `${GITHUB_API}/repos/${owner}/${repo}/readme`,
+      {
+        headers: githubHeaders,
+        headers: {
+          ...githubHeaders,
+          Accept:
+            "application/vnd.github.raw+json",
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error.message);
+
+    return "";
+  }
+};
+
 module.exports = {
   fetchRepositories,
   fetchBeginnerIssues,
   fetchSingleIssue,
+  fetchRepositoryContents,
+  fetchRepositoryReadme,
 };

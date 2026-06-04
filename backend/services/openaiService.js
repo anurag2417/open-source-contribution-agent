@@ -1,8 +1,8 @@
-const Groq = require("groq-sdk")
+const Groq = require("groq-sdk");
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
-})
+});
 
 const summarizeIssue = async (issue) => {
   try {
@@ -25,7 +25,7 @@ Provide response in this format:
 4. Step-by-Step Guidance
 5. Important Files To Check
 6. Estimated Completion Time
-`
+`;
 
     const response =
       await groq.chat.completions.create({
@@ -42,18 +42,18 @@ Provide response in this format:
           },
         ],
         temperature: 0.7,
-      })
+      });
 
-    return response.choices[0].message.content
+    return response.choices[0].message.content;
   } catch (error) {
-    console.log(error)
-    throw error
+    console.log(error);
+    throw error;
   }
-}
+};
 
 const generateContributionRoadmap = async (
   issue,
-  repository
+  repository,
 ) => {
   try {
     const prompt = `
@@ -90,7 +90,7 @@ Generate response in this format:
 10. Estimated Difficulty & Time
 
 Keep explanations beginner-friendly.
-`
+`;
 
     const response =
       await groq.chat.completions.create({
@@ -107,16 +107,85 @@ Keep explanations beginner-friendly.
           },
         ],
         temperature: 0.7,
-      })
+      });
 
-    return response.choices[0].message.content
+    return response.choices[0].message.content;
   } catch (error) {
-    console.log(error)
-    throw error
+    console.log(error);
+    throw error;
   }
-}
+};
+
+const analyzeRepositoryArchitecture = async (
+  repository,
+  contents,
+  readme,
+) => {
+  try {
+    const prompt = `
+You are an expert open source mentor.
+
+Analyze this repository and explain it for a beginner contributor.
+
+Repository:
+${repository.full_name}
+
+Description:
+${repository.description}
+
+Primary Language:
+${repository.language}
+
+Repository Contents:
+${contents
+  .map(
+    (item) =>
+      `${item.type}: ${item.name}`,
+  )
+  .join("\n")}
+
+README:
+${String(readme).slice(0, 4000)}
+
+Generate the response in this format:
+
+1. Project Type
+2. Tech Stack
+3. Important Folders
+4. Important Files
+5. Suggested Starting Point
+6. Contribution Tips
+7. Architecture Summary
+
+Keep everything beginner friendly.
+`;
+
+    const response =
+      await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert software architect and open source mentor.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.5,
+      });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 module.exports = {
   summarizeIssue,
   generateContributionRoadmap,
-}
+  analyzeRepositoryArchitecture,
+};

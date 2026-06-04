@@ -61,3 +61,14 @@ export const fetchRecommendations = async (
 
   return response.data;
 };
+
+export const fetchRepositoryAnalysis = async (
+  owner: string,
+  repo: string,
+) => {
+  const response = await API.get(
+    `/github/repository-analysis/${owner}/${repo}`,
+  );
+
+  return response.data;
+};

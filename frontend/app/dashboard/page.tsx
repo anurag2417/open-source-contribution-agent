@@ -11,6 +11,7 @@ import {
   fetchAISummary,
   fetchRoadmap,
   fetchRecommendations,
+  fetchRepositoryAnalysis,
 } from "../lib/api";
 
 import DashboardNavbar from "../components/layout/DashboardNavbar";
@@ -19,6 +20,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [analysis, setAnalysis] = useState<any>(null);
   const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [repositoryAnalysis, setRepositoryAnalysis] = useState<any>(null);
 
   const [repositories, setRepositories] = useState([]);
   const [issues, setIssues] = useState([]);
@@ -87,6 +89,13 @@ export default function DashboardPage() {
   const handleRepositoryClick = async (repo: any) => {
     try {
       setSelectedRepo(repo);
+
+      const analysis = await fetchRepositoryAnalysis(
+        repo.owner.login,
+        repo.name,
+      );
+
+      setRepositoryAnalysis(analysis);
 
       const data = await fetchIssues(repo.owner.login, repo.name, difficulty);
 
@@ -354,6 +363,36 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="max-h-[90vh] space-y-8 overflow-y-auto overflow-x-hidden pr-4">
+              {repositoryAnalysis && !selectedIssue && (
+                <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
+                  <h3 className="mb-6 text-2xl font-bold text-cyan-400">
+                    Repository Architecture
+                  </h3>
+
+                  <div className="mb-6 grid gap-4 md:grid-cols-2">
+                    <div>
+                      <p className="text-sm text-gray-400">Language</p>
+
+                      <p className="text-lg font-semibold">
+                        {repositoryAnalysis.language}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-400">Stars</p>
+
+                      <p className="text-lg font-semibold">
+                        ⭐ {repositoryAnalysis.stars}
+                      </p>
+                    </div>
+                  </div>
+
+                  <pre className="whitespace-pre-wrap text-sm leading-7 text-gray-300">
+                    {repositoryAnalysis.architecture}
+                  </pre>
+                </div>
+              )}
+              
               {!selectedIssue && analysis && (
                 <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
                   <h3 className="mb-6 text-2xl font-bold text-cyan-400">

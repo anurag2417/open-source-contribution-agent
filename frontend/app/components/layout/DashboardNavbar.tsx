@@ -8,10 +8,15 @@ interface DashboardNavbarProps {
     username?: string;
     avatar_url?: string;
   };
+  analysis?: {
+    experienceLevel?: string;
+    topLanguages?: string[];
+  };
 }
 
 export default function DashboardNavbar({
   user,
+  analysis,
 }: DashboardNavbarProps) {
   return (
     <nav className="border-b border-white/5 bg-black/90 backdrop-blur-md">
@@ -60,9 +65,21 @@ export default function DashboardNavbar({
                 @{user?.username || "github-user"}
               </p>
 
-              <p className="text-xs text-cyan-400">
-                Open Source Explorer
-              </p>
+              {analysis?.topLanguages?.length ? (
+                <p className="text-xs text-cyan-400">
+                  {analysis.topLanguages.slice(0, 3).join(" • ")}
+                </p>
+              ) : (
+                <p className="text-xs text-cyan-400">
+                  Open Source Explorer
+                </p>
+              )}
+
+              {analysis?.experienceLevel && (
+                <p className="text-xs text-white/70">
+                  {analysis.experienceLevel} Contributor
+                </p>
+              )}
             </div>
           </div>
 

@@ -14,10 +14,9 @@ import {
 
 import DashboardNavbar from "../components/layout/DashboardNavbar";
 
-
-
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
+  const [analysis, setAnalysis] = useState<any>(null);
   const [repositories, setRepositories] = useState([]);
   const [issues, setIssues] = useState([]);
 
@@ -51,10 +50,19 @@ export default function DashboardPage() {
     const params = new URLSearchParams(window.location.search);
 
     const userParam = params.get("user");
+    const analysisParam = params.get("analysis");
 
     if (userParam) {
       try {
         setUser(JSON.parse(decodeURIComponent(userParam)));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    if (analysisParam) {
+      try {
+        setAnalysis(JSON.parse(decodeURIComponent(analysisParam)));
       } catch (error) {
         console.log(error);
       }
@@ -107,7 +115,7 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <DashboardNavbar user={user || {}} />
+      <DashboardNavbar user={user || {}} analysis={analysis} />
       <div className="grid h-[calc(100vh-81px)] lg:grid-cols-[340px_420px_1fr]">
         <div className="border-r border-white/5 p-6">
           <h2 className="mb-8 text-2xl font-bold">Repositories</h2>

@@ -295,10 +295,10 @@ export default function DashboardPage() {
   const learningGap = getLearningGapAnalysis();
 
   return (
-    <main className="h-screen overflow-hidden bg-black text-white">
+    <main className="min-h-screen bg-black text-white">
       <DashboardNavbar user={user || {}} analysis={analysis} />
 
-      <div className="h-[calc(100vh-81px)] grid lg:grid-cols-[340px_420px_1fr] overflow-hidden">
+      <div className="grid h-[calc(100vh-81px)] lg:grid-cols-[340px_420px_1fr]">
         <div className="border-r border-white/5 p-6">
           <h2 className="mb-8 text-2xl font-bold">Repositories</h2>
 
@@ -349,7 +349,7 @@ export default function DashboardPage() {
 
         <div className="border-r border-white/5 p-6">
           {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Issues
-          <div className="max-h-[85vh] space-y-4 overflow-y-auto overflow-x-hidden pr-2">
+          <div className="h-[calc(100vh-160px)] space-y-8 overflow-y-auto overflow-x-hidden pr-4">
             {issues.map((issue: any) => (
               <button
                 key={issue.id}

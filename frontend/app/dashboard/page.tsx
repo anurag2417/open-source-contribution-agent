@@ -411,6 +411,26 @@ export default function DashboardPage() {
                 </div>
               )}
 
+              {repositoryAnalysis?.contents && (
+                <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
+                  <h3 className="mb-6 text-2xl font-bold text-cyan-400">
+                    Repository Explorer
+                  </h3>
+
+                  <div className="space-y-2">
+                    {repositoryAnalysis.contents.map((item: any) => (
+                      <div key={item.path} className="flex items-center gap-3">
+                        <span className="text-cyan-400">
+                          {item.type === "dir" ? "📁" : "�"}
+                        </span>
+
+                        <span>{item.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {!selectedIssue && analysis && (
                 <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
                   <h3 className="mb-6 text-2xl font-bold text-cyan-400">

@@ -389,7 +389,7 @@ export default function DashboardPage() {
               </p>
             </div>
           ) : (
-            <div className="h-full overflow-y-auto overflow-x-hidden pr-4">
+            <div className="h-full space-y-8 overflow-y-auto overflow-x-hidden pr-4 pb-16">
               {repositoryAnalysis && !selectedIssue && (
                 <div className="rounded-3xl border border-white/5 bg-white/5 p-8">
                   <h3 className="mb-6 text-2xl font-bold text-cyan-400">

@@ -318,7 +318,7 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          <div className="max-h-[85vh] space-y-4 overflow-y-auto overflow-x-hidden pr-2">
+          <div className="h-[calc(100vh-220px)] space-y-4 overflow-y-auto overflow-x-hidden pr-2">
             {repositories.map((repo: any) => (
               <button
                 key={repo.id}
@@ -349,7 +349,7 @@ export default function DashboardPage() {
 
         <div className="border-r border-white/5 p-6">
           {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Issues
-          <div className="h-[calc(100vh-160px)] space-y-8 overflow-y-auto overflow-x-hidden pr-4">
+          <div className="h-[calc(100vh-220px)] space-y-4 overflow-y-auto overflow-x-hidden pr-2">
             {issues.map((issue: any) => (
               <button
                 key={issue.id}
@@ -379,7 +379,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="h-[calc(100vh-81px)] overflow-hidden p-6">
           <h2 className="mb-8 text-3xl font-bold">AI Contribution Assistant</h2>
 
           {loading ? (

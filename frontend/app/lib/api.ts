@@ -6,7 +6,9 @@ const API = axios.create({
     "http://localhost:5000/api",
 });
 
-export const fetchRepositories = async (difficulty: string) => {
+export const fetchRepositories = async (
+  difficulty: string,
+) => {
   const response = await API.get(
     `/github/repositories?difficulty=${difficulty}`,
   );
@@ -45,6 +47,16 @@ export const fetchRoadmap = async (
 ) => {
   const response = await API.get(
     `/github/roadmap/${owner}/${repo}/${issueNumber}`,
+  );
+
+  return response.data;
+};
+
+export const fetchRecommendations = async (
+  username: string,
+) => {
+  const response = await API.get(
+    `/github/recommendations/${username}`,
   );
 
   return response.data;
